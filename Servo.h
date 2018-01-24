@@ -19,7 +19,7 @@ public:
 
 	Servo();
 	int getSpeed(){ return currentspeed; }
-	void setTargetSpeed(long);
+	void setTargetSpeed(int);
 	int calESC();
 	~Servo();
 
