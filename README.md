@@ -1,2 +1,2 @@
-# Fury-Servo
-Servo and Motor Control Code for Fury (Old)
+# Servo
+Legacy Servo and Motor Control Code
