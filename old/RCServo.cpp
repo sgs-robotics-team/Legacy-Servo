@@ -131,7 +131,7 @@ initChannel(PhidgetHandle ch) {
 	*
 	* The default is any device.
 	*/
-	// Phidget_setDeviceSerialNumber(ch, <YOUR DEVICE SERIAL NUMBER>); 
+	// Phidget_setDeviceSerialNumber(ch, <YOUR DEVICE SERIAL NUMBER>);
 
 	/*
 	* For VINT devices, this specifies the port the VINT device must be plugged into.

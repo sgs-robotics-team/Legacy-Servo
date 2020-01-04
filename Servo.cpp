@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <phidget22.h>
+#include <iostream>
+#include "Servo.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,14 +119,90 @@ static PhidgetReturnCode CCONV initChannel(PhidgetHandle ch) {
 		return (res);
 	}
 
-    return (EPHIDGET_OK);
+	return (EPHIDGET_OK);
+
 }
 
-static void CCONV
-ssleep(int tm) {
+static void CCONV ssleep(int tm) {
 #ifdef _WIN32
 	Sleep(tm * 1000);
 #else
 	sleep(tm);
 #endif
+}
+
+Servo::Servo(){
+
+ 	PhidgetLog_enable(PHIDGET_LOG_INFO, NULL);
+
+	res = PhidgetRCServo_create(&ch);
+	if (res != EPHIDGET_OK) {
+		fprintf(stderr, "failed to create rc servo channel\n");
+		exit(1);
+	}
+
+	res = initChannel((PhidgetHandle)ch);
+	if (res != EPHIDGET_OK) {
+		Phidget_getErrorDescription(res, &errs);
+		fprintf(stderr, "failed to initialize channel:%s\n", errs);
+		exit(1);
+	}
+
+	res = PhidgetRCServo_setOnPositionChangeHandler(ch, onPositionChangeHandler, NULL);
+	if (res != EPHIDGET_OK) {
+		Phidget_getErrorDescription(res, &errs);
+		fprintf(stderr, "failed to set position change handler: %s\n", errs);
+		goto done;
+	}
+
+	res = PhidgetRCServo_setOnVelocityChangeHandler(ch, onVelocityChangeHandler, NULL);
+	if (res != EPHIDGET_OK) {
+		Phidget_getErrorDescription(res, &errs);
+		fprintf(stderr, "failed to set velocity change handler: %s\n", errs);
+		goto done;
+	}
+
+	res = PhidgetRCServo_setOnTargetPositionReachedHandler(ch, onTargetPositionReachedHandler, NULL);
+	if (res != EPHIDGET_OK) {
+		Phidget_getErrorDescription(res, &errs);
+		fprintf(stderr, "failed to set target position reached handler: %s\n", errs);
+		goto done;
+	}
+
+	/*
+	* Open the channel synchronously: waiting a maximum of 5 seconds.
+	*/
+	res = Phidget_openWaitForAttachment((PhidgetHandle)ch, 5000);
+	if (res != EPHIDGET_OK) {
+		if (res == EPHIDGET_TIMEOUT) {
+			printf("Channel did not attach after 5 seconds: please check that the device is attached\n");
+		} else {
+			Phidget_getErrorDescription(res, &errs);
+			fprintf(stderr, "failed to open channel:%s\n", errs);
+		}
+		goto done;
+	}
+
+}
+
+int Servo::setTargetSpeed(int){
+
+
+}
+
+int Servo::calESC(){
+
+	//To be implemented
+	//Return 1 for Failure, 0 for Success
+
+	return 0;
+
+}
+
+Servo::~Servo(){
+
+	Phidget_close((PhidgetHandle)ch);
+	PhidgetRCServo_delete(&ch);
+	exit(res);
+
 }
